@@ -1,0 +1,17 @@
+Autoscroll.pm
+-------------
+Enables scrolling by pressing middle button and freely moving cursor
+around the widget.
+
+Start test (after make) with
+
+	perl -Mblib examples/autoscroll.pl
+
+Installation:
+
+	perl Makefile.PL
+	make
+	make install
+
+Slaven Rezic <srezic@cpan.org>
+
