@@ -2,10 +2,10 @@
 # -*- perl -*-
 
 #
-# $Id: autoscroll.pl,v 1.4 1999/07/08 22:56:12 eserte Exp $
+# $Id: autoscroll.pl,v 1.8 2003/10/22 21:06:19 eserte Exp $
 # Author: Slaven Rezic
 #
-# Copyright (C) 1999 Slaven Rezic. All rights reserved.
+# Copyright (C) 1999,2002 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,10 +15,11 @@
 
 use Tk;
 use Tk::Autoscroll qw(as_default);
+@Tk::Autoscroll::default_args = (-stoptrigger => '<ButtonRelease-2>');
 
 $top = new MainWindow;
 
-$top->Label(-text => "Press middle button to en/disable scrolling")->pack;
+$top->Label(-text => "Hold middle button to en/disable scrolling")->pack;
 
 $lb = $top->Scrolled('Listbox')->pack;
 $lb->insert("end", 1..1000);

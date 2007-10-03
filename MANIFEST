@@ -6,3 +6,4 @@ Changes
 README
 examples/autoscroll.pl
 test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

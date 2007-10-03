@@ -2,7 +2,7 @@
 # -*- perl -*-
 
 #
-# $Id: test.pl,v 1.3 2001/05/05 19:15:21 eserte Exp $
+# $Id: test.pl,v 1.4 2003/10/22 21:06:10 eserte Exp $
 # Author: Slaven Rezic
 #
 # Copyright (C) 1999 Slaven Rezic. All rights reserved.
@@ -12,6 +12,8 @@
 # Mail: eserte@cs.tu-berlin.de
 # WWW:  http://user.cs.tu-berlin.de/~eserte/
 #
+
+if (!defined $ENV{BATCH}) { $ENV{BATCH} = 1 }
 
 @subscripts = qw(
 		 autoscroll.pl

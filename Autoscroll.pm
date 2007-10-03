@@ -1,32 +1,33 @@
 # -*- perl -*-
 
 #
-# $Id: Autoscroll.pm,v 1.11 2001/05/05 19:14:44 eserte Exp $
+# $Id: Autoscroll.pm,v 1.14 2006/09/10 08:39:38 eserte Exp $
 # Author: Slaven Rezic
 #
-# Copyright (C) 1999,2001 Slaven Rezic. All rights reserved.
+# Copyright (C) 1999,2001,2002 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
-# Mail: eserte@cs.tu-berlin.de
-# WWW:  http://user.cs.tu-berlin.de/~eserte/
+# Mail: slaven@rezic.de
+# WWW:  http://www.rezic.de/eserte/
 #
 
 package Tk::Autoscroll;
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION @default_args);
 
 my $count = 0;
 my $prefix = "Autoscroll";
 
-$VERSION = sprintf "%d.%02d", q$Revision: 1.11 $ =~ /(\d+)\.(\d+)/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.14 $ =~ /(\d+)\.(\d+)/;
 
 sub import {
     if (defined $_[1] and $_[1] eq 'as_default') {
 	local $^W = 0;
 	eval q{
 	    use Tk::Widget;
-	    package Tk::Widget;
+	    package # hide from CPAN indexer
+		Tk::Widget;
 	    # XXX better solution!!!!!!
 	    sub Scrolled
 	      {
@@ -48,7 +49,7 @@ sub import {
 				  );
 		  $cw->AddScrollbars($w);
 		  $cw->Default("\L$kind" => $w);
-		  Tk::Autoscroll::Init($w);
+		  Tk::Autoscroll::Init($w, @Tk::Autoscroll::default_args);
 		  $cw->Delegates('bind' => $w, 'bindtags' => $w);
 		  $cw->ConfigDefault(\%args);
 		  $cw->configure(%args);
@@ -67,7 +68,8 @@ sub Init {
     my(%args) = @_;
     $w = _get_real_widget($w);
 
-    my $trigger = delete $args{'-trigger'} || '<Button-2>';
+    my $trigger = delete $args{'-trigger'} || '<ButtonPress-2>';
+    my $stop_trigger = delete $args{'-stoptrigger'};
 
     foreach my $cmd (qw(beforestart afterstart beforestop afterstop)) {
 	$w->{$prefix . '_' . $cmd} =
@@ -77,6 +79,9 @@ sub Init {
     $w->Tk::bind($trigger   => sub { Start($w, %args) });
     # XXX shouldn't delete the motion binding, if there is already one
     $w->Tk::bind('<Motion>' => sub { });
+    if ($stop_trigger) {
+	$w->Tk::bind($stop_trigger => sub { Stop($w) });
+    }
     my $top = $w->toplevel;
     $top->{$prefix .'_Permanent'}{Trigger} = $trigger;
 }
@@ -275,6 +280,14 @@ Possible options:
 
 Default value is "<Button-2>"
 
+=item -stoptrigger
+
+An event to stop autoscrolling. Normally, this is not defined meaning
+that autoscrolling will stop if Button-2 is pressed again. If
+C<-stoptrigger> is set to C<E<lt>ButtonRelease-2E<gt>>, then the user
+have to hold the middle button down to autoscroll and autoscrolling
+will stop if the user releases the button.
+
 =item -speed
 
 Values are "slow", "normal" and "fast". Default value is "normal".
@@ -288,6 +301,12 @@ perl/Tk callbacks (i.e. the [ ] notation). The "-before" callbacks
 should return true, otherwise the operation is cancelled.
 
 =back
+
+If you want to apply any C<Init> options to all widgets when using
+C<as_default>, then you can define the global variable
+C<@default_args>. Example:
+
+    @Tk::Autoscroll::default_args = (-stoptrigger => '<ButtonRelease-2>');
 
 =head2 Reset($widget)
 
@@ -308,11 +327,11 @@ L<Tk|Tk>, L<Tk::Scrolled|Tk::Scrolled>
 
 =head1 AUTHOR
 
-Slaven Rezic <eserte@cs.tu-berlin.de>
+Slaven Rezic <slaven@rezic.de>
 
 =head1 COPYRIGHT
 
-Copyright (c) 1999,2001 Slaven Rezic. All rights reserved.
+Copyright (c) 1999,2001,2002 Slaven Rezic. All rights reserved.
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
